@@ -1655,6 +1655,7 @@ function renderTop5(){
         <div class="t5-handle" onclick="event.stopPropagation()">⠿</div>
         <div class="t5-text${task.done?' done':''}" onclick="toggleTop5(${i})">${task.text}</div>
         <div class="t5-check${task.done?' done':''}" style="${task.done?`background:${color};border-color:${color}`:`border-color:${color}`}" onclick="event.stopPropagation();toggleTop5(${i})">✓</div>
+        <button class="t5-del" onclick="event.stopPropagation();openTop5Sheet(${i})">✎</button>
         <button class="t5-del" onclick="event.stopPropagation();removeTop5(${i})">×</button>
       </div>`;
     } else {
@@ -1671,12 +1672,20 @@ function renderTop5(){
   document.querySelectorAll('.top5-slot.filled[draggable]').forEach(el=>{
     el.ondragstart=e=>{
       t5DragIdx=parseInt(el.dataset.idx);
-      // 타임라인 드래그도 겸용
       tlDragText=el.querySelector('.t5-text').textContent;
       tlDragColor=RANK_COLORS[t5DragIdx]||COLORS[0];
       el.classList.add('dragging');e.dataTransfer.effectAllowed='move';
+      document.body.classList.add('tl-dragging');
+      // 타임라인 자동 오픈
+      const body=document.getElementById('tl-body'),arr=document.getElementById('tl-arrow');
+      if(!body.classList.contains('open')){body.classList.add('open');arr.classList.add('open');}
     };
-    el.ondragend=()=>{el.classList.remove('dragging');t5DragIdx=null;};
+    el.ondragend=()=>{
+      el.classList.remove('dragging');
+      t5DragIdx=null;
+      tlDragText=null;tlDragColor=null;
+      document.body.classList.remove('tl-dragging');
+    };
     el.ontouchstart=e=>t5TouchStart(e,el);
   });
 }
